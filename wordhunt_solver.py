@@ -1,18 +1,16 @@
-from PyDictionary import PyDictionary
 import csv
 import os
 
 files = os.listdir('dictionary')
-dictionary = []
+dictionary_mod = {
+	"a":[],"b":[],"c":[],"d":[],"e":[],"f":[],"g":[],"h":[],"i":[],"j":[],"k":[],"l":[],"m":[],"n":[],"o":[],"p":[],"q":[],"r":[],"s":[],"t":[],"u":[],"v":[],"w":[],"x":[],"y":[],"z":[]
+}
 
-for file in files:
-	print(file)
-	with open('dictionary/{}'.format(file), newline = '') as csvfile:
-		csvreader = csv.reader(csvfile, delimiter=',')
-		for row in csvreader:
-			print(row[0])
-			dictionary.append(str(row[0]).strip())
-print(dictionary)
+with open('dictionary/dictionary.csv', newline = '') as csvfile:
+	csvreader = csv.reader(csvfile, delimiter=',')
+	for row in csvreader:
+		dictionary_mod[row[0][0].lower()].append(str(row[0]).strip())
+
 #dictionary = PyDictionary()
 
 all_words = []
@@ -24,11 +22,12 @@ illegal_word_pairs = ["bx", "cj", "cv", "cx", "dx", "fq", "fx", "gq", "gx", "hx"
 def main():
 	global all_words
 
-	raw = input("The string of words: ")
+	# raw = input("The string of words: ")
+	raw = "MLGVRENAECTHAMTW".lower()
 	grid = []
 
 	for i in range(0,4):
-		grid.append(list(raw[i*4:i*4+4]))
+		grid.append(list(raw.lower()[i*4:i*4+4]))
 
 	visited = [[False,False,False,False],[False,False,False,False],[False,False,False,False],[False,False,False,False]]
 
@@ -38,15 +37,12 @@ def main():
 		for j in range(0,4):
 			grep_words(grid,i,j,visited);
 
-	print(all_words)
+	all_words = sorted(all_words, key=len)[::-1]
 
-	for word in all_words:
-		if dictionary.meaning(word, True):
-			print(word)
+	[print("\t**" + word) if len(word)>4 else None for word in all_words]
 
 def check_validity(word):
-	value_word = "".join(["1" if i in consonants else "0" for i in word])
-	print(value_word)
+	value_word = "".join(["1" if i.lower() in consonants else "0" for i in word])
 	if "1111" in value_word or "0000" in value_word:
 		return False
 	elif "111" == value_word[:3]:
@@ -57,19 +53,16 @@ def check_validity(word):
 def grep_words(grid,y,x,visit,full_word="",l=0):
 	global all_words
 
-	if l > 7 or check_validity(full_word) == False:
+	if l > 8 or check_validity(full_word) == False:
 		return
 	for pair in illegal_word_pairs:
 		if pair in full_word:
 			return
 
-	print(full_word + " --- " + str(check_validity(full_word)) + str(len(all_words)))
-
 	visit[y][x] = True
 	full_word += grid[y][x]
-	if full_word not in all_words and len(full_word) >= 3 and full_word.lower() in dictionary:
+	if full_word not in all_words and len(full_word) >= 3 and full_word.lower() in dictionary_mod[full_word[0].lower()]:
 		all_words.append(full_word)
-		print(full_word + "    " + str(len(all_words)))
 
 	for i in range(-1,2):
 		for j in range(-1,2):
