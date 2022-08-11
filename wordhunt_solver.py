@@ -23,7 +23,8 @@ def main():
 	global all_words
 
 	# raw = input("The string of words: ")
-	raw = "MLGVRENAECTHAMTW".lower()
+	# raw = "MLGVRENAECTHAMTW".lower()
+	raw = input("Input the grid as a string of letters: ").lower()
 	grid = []
 
 	for i in range(0,4):
@@ -53,7 +54,7 @@ def check_validity(word):
 def grep_words(grid,y,x,visit,full_word="",l=0):
 	global all_words
 
-	if l > 8 or check_validity(full_word) == False:
+	if l > 7 or check_validity(full_word) == False:
 		return
 	for pair in illegal_word_pairs:
 		if pair in full_word:
