@@ -1,5 +1,22 @@
 import csv
 import os
+from PIL import Image
+import pytesseract
+import cv2
+
+img_cv = cv2.imread(r'./misc/example_grid.jpg')
+
+retval, img = cv2.threshold(img_cv, 20, 225, cv2.THRESH_BINARY)
+img = cv2.GaussianBlur(img, (11,11), 0)
+img = cv2.medianBlur(img, 5)
+cv2.imshow('test', img_cv)
+cv2.waitKey(0)
+cv2.destroyAllWindows();
+
+text = pytesseract.image_to_string(img)
+
+# print(text)
+print(text.replace('|', "I").replace('\n','').replace(' ', ''))
 
 #intializations
 files = os.listdir('dictionary')
@@ -23,7 +40,14 @@ def main():
 	global all_words #need to declare global access apparently
 
 	#input collection and sanitization
-	raw = input("Input the grid as a string of letters: ").lower().strip()
+	choice = input("Photo (1) or input (2): ")
+	if "2" in choice:
+		raw = input("Input the grid as a string of letters: ").lower().strip()
+	else:
+		try:
+			raw = text.split('SCORE: ')[1][4:].replace('|', "I").replace('\n','').replace(' ', '')
+		except:
+			raw = text.replace('|', "I").replace('\n','').replace(' ', '')
 	grid = []
 	for i in range(0,4):
 		grid.append(list(raw.lower()[i*4:i*4+4]))
@@ -43,7 +67,7 @@ def main():
 	all_words = sorted(all_words, key=len)[::-1]
 
 	#outputting faster
-	[print("\t** " + word) if len(word)>4 else None for word in all_words]
+	[print('\t-- ' + word) for word in all_words[:15 if len(all_words) > 15 else len(all_words)]]
 
 #this function checks if the word has 4 or more consonants or vowels in a row and disqualifies it as a word because thats not too common
 #also checks if it starts with more than 3 consonants and if it does makes sure it has an s at the beginning because otherwise also not that common
